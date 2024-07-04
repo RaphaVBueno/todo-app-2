@@ -28,6 +28,30 @@ function Dia() {
     navigate(`/dia/${prevDate.toISOString().slice(0, 10)}`)
   }
 
+  function getDayLabel(date) {
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(today.getDate() + 1)
+    const yesterday = new Date(today)
+    yesterday.setDate(today.getDate() - 1)
+
+    const dateObj = new Date(date)
+    dateObj.setDate(dateObj.getDate() + 1)
+    console.log(dateObj.getDate())
+
+    if (dateObj.toLocaleDateString() === today.toLocaleDateString()) {
+      return 'Hoje'
+    } else if (dateObj.toLocaleDateString() === tomorrow.toLocaleDateString()) {
+      return 'Amanhã'
+    } else if (
+      dateObj.toLocaleDateString() === yesterday.toLocaleDateString()
+    ) {
+      return 'Ontem'
+    } else {
+      return dateObj.getDate()
+    }
+  }
+
   return (
     <main className="container">
       <article>
@@ -40,7 +64,7 @@ function Dia() {
               </li>
               <li>
                 <hgroup>
-                  <h3></h3>
+                  <h3>{getDayLabel(date)}</h3>
                   <p>{formattedDate}</p>
                 </hgroup>
               </li>
