@@ -3,7 +3,8 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const sql = postgres(process.env.DB)
+const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db' //alterar esse endereço para o endereço do seu banco de dados
+const sql = postgres(DB)
 const app = express()
 
 app.use(express.urlencoded({ extended: true }))
@@ -21,6 +22,8 @@ const port = 3000
 app.listen(port, () => {
   console.log('Servidor rodando em http://localhost:' + port)
 })
+
+console.log('URL de conexão:', process.env.DB)
 
 const uptadeDados = async (title, date, user = 'rapha@mail.com') => {
   await sql`
@@ -66,5 +69,5 @@ app.get('/dados', async (req, res) => {
 app.post('/add-tarefa', async (req, res) => {
   const { title, date } = req.body
   await uptadeDados(title, date)
-  res.redirect('back')
+  res.json({ message: 'OK' })
 })
