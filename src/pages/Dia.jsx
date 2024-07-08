@@ -74,6 +74,10 @@ function Dia() {
             </ul>
           </nav>
         </header>
+        <div className="new-task">
+          <input type="text" placeholder="Nova tarefa" />
+          <button>Adicionar</button>
+        </div>
       </article>
     </main>
   )
