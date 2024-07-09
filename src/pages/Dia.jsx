@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { format, parseISO, addDays, subDays, isSameDay } from 'date-fns'
 
 function Dia() {
   const [input, setInput] = useState('')
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState([]) //aqui voce vai salvar as tasks q vierem do backend usando uma function dentro de useeffect, e depois mostrar as tarefas na tela
   const { date } = useParams()
   const navigate = useNavigate()
 
@@ -16,7 +17,21 @@ function Dia() {
     return `${dia}/${mes}/${ano}`
   }
 
-  const formattedDate = formatarData(date)
+  const formattedDate = format(parseISO(date), 'dd/MM/yyyy')
+
+  useEffect(() => {
+    const fetchDados = async () => {
+      try {
+        const response = await axios.get(`/dados?date=${date}`)
+        setTasks(response.data)
+        console.log(response.data)
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error)
+      }
+    }
+
+    fetchDados()
+  }, [date])
 
   const handlePrevDay = () => {
     const prevDate = new Date(date)
@@ -63,18 +78,15 @@ function Dia() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
-      // Crie um objeto com os dados da nova tarefa
       const newTask = {
         title: input,
         status: false,
         date: date, //formato da data igual na barra de url AAAA-MM-DD
       }
 
-      // Faça a requisição para o endpoint /addtarefa usando o Axios
       const response = await axios.post('/add-tarefa', newTask)
 
       if (response.status === 200) {
-        // Se a requisição for bem-sucedida, atualize o estado das tarefas
         const updatedTasks = [...tasks, newTask]
         setTasks(updatedTasks)
         setInput('')

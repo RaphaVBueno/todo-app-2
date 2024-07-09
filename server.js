@@ -3,7 +3,7 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db' //alterar esse endereço para o endereço do seu banco de dados
+const DB = 'postgres://postgres:123@localhost:5432/todo-app-db'
 const sql = postgres(DB)
 const app = express()
 
@@ -11,19 +11,15 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 const __filename = fileURLToPath(import.meta.url)
-// Obtenha o diretório pai desse caminho
 const __dirname = path.dirname(__filename)
 
-// Configure o middleware para servir arquivos estáticos da pasta 'dist'
 app.use(express.static(path.join(__dirname, 'dist')))
 
-const port = 3000
+const port = 3001 //ajustar para porta 3000
 
 app.listen(port, () => {
   console.log('Servidor rodando em http://localhost:' + port)
 })
-
-console.log('URL de conexão:', process.env.DB)
 
 const uptadeDados = async (title, date, user = 'rapha@mail.com') => {
   await sql`
@@ -62,6 +58,7 @@ app.get('/dados', async (req, res) => {
       SELECT * FROM tasks WHERE date = ${currentDate};
     `
   }
+  console.log(dados)
 
   res.send(dados)
 })
