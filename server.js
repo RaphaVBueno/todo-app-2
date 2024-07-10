@@ -3,7 +3,7 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const DB = 'postgres://postgres:123@localhost:5432/todo-app-db'
+const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db'
 const sql = postgres(DB)
 const app = express()
 
@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename)
 
 app.use(express.static(path.join(__dirname, 'dist')))
 
-const port = 3001 //ajustar para porta 3000
+const port = 3000
 
 app.listen(port, () => {
   console.log('Servidor rodando em http://localhost:' + port)
@@ -36,6 +36,17 @@ const updateStatus = async (title, status) => {
   await sql`
     UPDATE tasks SET status = ${status} WHERE title = ${title};
   `
+}
+
+const updateDescription = async (title, description, date) => {
+  await sql`
+    UPDATE tasks SET description = ${description} WHERE title = ${title};
+  `
+}
+
+const deleteTask = async (title, date) => {
+  await sql`
+  DELETE FROM tasks WHERE title = ${title};`
 }
 
 app.post('/updateStatus', async (req, res) => {
@@ -66,5 +77,17 @@ app.get('/dados', async (req, res) => {
 app.post('/add-tarefa', async (req, res) => {
   const { title, date } = req.body
   await uptadeDados(title, date)
+  res.json({ message: 'OK' })
+})
+
+app.post('/add-description', async (req, res) => {
+  const { title, description, date } = req.body
+  await updateDescription(title, description, date)
+  res.json({ message: 'OK' })
+})
+
+app.post('/delete-task', async (req, res) => {
+  const { title, date } = req.body
+  await deleteTask(title, date)
   res.json({ message: 'OK' })
 })

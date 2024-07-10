@@ -33,6 +33,10 @@ function Dia() {
     fetchDados()
   }, [date])
 
+  function routeDescription() {
+    //criar uma função que recebe o valor de title da task e tranforma o texto em string com traço no lugar de espaço e usa navigate para a rota /tarefa/:date/:taskTitle
+  }
+
   const handlePrevDay = () => {
     const prevDate = new Date(date)
     prevDate.setDate(prevDate.getDate() - 1)
