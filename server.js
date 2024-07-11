@@ -3,7 +3,7 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const DB = 'postgres://postgres:123@localhost:5432/todo-app-db'
+const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db'
 const sql = postgres(DB)
 const app = express()
 
@@ -38,9 +38,9 @@ const updateStatus = async (title, status) => {
   `
 }
 
-const updateDescription = async (title, description, date) => {
+const updateDescription = async (id, description) => {
   await sql`
-    UPDATE tasks SET description = ${description} WHERE title = ${title};
+    UPDATE tasks SET description = ${description} WHERE id = ${id};
   `
 }
 
@@ -69,8 +69,6 @@ app.get('/dados', async (req, res) => {
       SELECT * FROM tasks WHERE date = ${currentDate};
     `
   }
-  console.log(dados)
-
   res.send(dados)
 })
 
@@ -81,8 +79,8 @@ app.post('/add-tarefa', async (req, res) => {
 })
 
 app.post('/add-description', async (req, res) => {
-  const { title, description, date } = req.body
-  await updateDescription(title, description, date)
+  const { id, description } = req.body
+  await updateDescription(id, description)
   res.json({ message: 'OK' })
 })
 
@@ -90,4 +88,14 @@ app.post('/delete-task', async (req, res) => {
   const { title, date } = req.body
   await deleteTask(title, date)
   res.json({ message: 'OK' })
+})
+
+app.get('/id-dados', async (req, res) => {
+  const { id } = req.query
+  let dados
+  dados = await sql`
+      SELECT * FROM tasks WHERE id = ${id};
+    `
+  console.log(dados)
+  res.send(dados)
 })

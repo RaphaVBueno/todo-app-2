@@ -5,7 +5,7 @@ import { format, parseISO } from 'date-fns'
 
 function Dia() {
   const [input, setInput] = useState('')
-  const [tasks, setTasks] = useState([]) //aqui voce vai salvar as tasks q vierem do backend usando uma function dentro de useeffect, e depois mostrar as tarefas na tela
+  const [tasks, setTasks] = useState([])
   const { date } = useParams()
   const navigate = useNavigate()
 
@@ -24,7 +24,6 @@ function Dia() {
       try {
         const response = await axios.get(`/dados?date=${date}`)
         setTasks(response.data)
-        console.log(response.data)
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
       }
@@ -33,8 +32,8 @@ function Dia() {
     fetchDados()
   }, [date])
 
-  function routeDescription() {
-    //criar uma função que recebe o valor de title da task e tranforma o texto em string com traço no lugar de espaço e usa navigate para a rota /tarefa/:date/:taskTitle
+  const routeDescription = (taskId, date) => {
+    navigate(`/tarefa/${date}/${taskId}`)
   }
 
   const handlePrevDay = () => {
@@ -98,7 +97,7 @@ function Dia() {
       const newTask = {
         title: input,
         status: false,
-        date: date, //formato da data igual na barra de url AAAA-MM-DD
+        date: date, //AAAA-MM-DD
       }
 
       const response = await axios.post('/add-tarefa', newTask)
@@ -157,7 +156,9 @@ function Dia() {
                 checked={task.status}
                 onChange={(event) => handleChange(event, task.title)}
               />
-              {task.title}
+              <a href="#" onClick={() => routeDescription(task.id, date)}>
+                {task.title}
+              </a>
             </li>
           ))}
         </ul>

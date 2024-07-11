@@ -19,7 +19,7 @@ const router = createBrowserRouter([
     element: <Dia />,
   },
   {
-    path: '/tarefa/:taskTitle', //aqui deve ter o seguinte formato /tarefa/:date/:taskTitle
+    path: '/tarefa/:date/:taskId', //'/tarefa/:date/:taskId'
     element: <Description />,
   },
 ])
