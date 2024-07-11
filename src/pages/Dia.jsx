@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { format, parseISO, addDays, subDays, isSameDay } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 
 function Dia() {
   const [input, setInput] = useState('')
@@ -75,8 +75,21 @@ function Dia() {
     }
   }
 
-  const handleChange = (event) => {
-    setInput(event.target.value)
+  const handleChange = (event, title) => {
+    const newStatus = event.target.checked
+    updateTaskStatus(title, newStatus)
+  }
+
+  const updateTaskStatus = async (title, status) => {
+    try {
+      await axios.post('/updateStatus', { title, status })
+      const updatedTasks = tasks.map((task) =>
+        task.title === title ? { ...task, status } : task
+      )
+      setTasks(updatedTasks)
+    } catch (error) {
+      console.error('Erro ao atualizar status da tarefa:', error)
+    }
   }
 
   const handleSubmit = async (event) => {
@@ -131,11 +144,23 @@ function Dia() {
               name="tarefa"
               id="tarefa"
               value={input}
-              onChange={handleChange}
+              onChange={(event) => setInput(event.target.value)}
             />
             <button type="submit">+</button>
           </form>
         </div>
+        <ul>
+          {tasks.map((task) => (
+            <li key={task.id}>
+              <input
+                type="checkbox"
+                checked={task.status}
+                onChange={(event) => handleChange(event, task.title)}
+              />
+              {task.title}
+            </li>
+          ))}
+        </ul>
       </article>
     </main>
   )
