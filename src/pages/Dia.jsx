@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { format, parseISO } from 'date-fns'
+import '../App.css'
 
 function Dia() {
   const [input, setInput] = useState('')
@@ -85,7 +86,8 @@ function Dia() {
       const updatedTasks = tasks.map((task) =>
         task.title === title ? { ...task, status } : task
       )
-      setTasks(updatedTasks)
+      const sortedTasks = updatedTasks.sort((a, b) => a.status - b.status) //
+      setTasks(sortedTasks)
     } catch (error) {
       console.error('Erro ao atualizar status da tarefa:', error)
     }
@@ -111,6 +113,16 @@ function Dia() {
       }
     } catch (error) {
       console.error('Erro ao processar a requisição:', error)
+    }
+  }
+
+  const handleDelete = async (taskId) => {
+    try {
+      await axios.delete(`/delete-tarefa/${taskId}`)
+      const updatedTasks = tasks.filter((task) => task.id !== taskId)
+      setTasks(updatedTasks)
+    } catch (error) {
+      console.error('Erro ao deletar tarefa:', error)
     }
   }
 
@@ -151,14 +163,21 @@ function Dia() {
         <ul>
           {tasks.map((task) => (
             <li key={task.id}>
-              <input
-                type="checkbox"
-                checked={task.status}
-                onChange={(event) => handleChange(event, task.title)}
-              />
-              <a href="#" onClick={() => routeDescription(task.id, date)}>
-                {task.title}
-              </a>
+              <div className="task-item">
+                <input
+                  type="checkbox"
+                  checked={task.status}
+                  onChange={(event) => handleChange(event, task.title)}
+                />
+                <a
+                  href="#"
+                  onClick={() => routeDescription(task.id, date)}
+                  className={task.status ? 'completed-task' : 'incomplete-task'}
+                >
+                  {task.title}
+                </a>
+                <button className="delete-button">X</button>
+              </div>
             </li>
           ))}
         </ul>

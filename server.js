@@ -3,7 +3,7 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db'
+const DB = 'postgres://postgres:123@localhost:5432/todo-app-db'
 const sql = postgres(DB)
 const app = express()
 
