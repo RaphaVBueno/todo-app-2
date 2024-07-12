@@ -3,7 +3,7 @@ import postgres from 'postgres'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
-const DB = 'postgres://postgres:123@localhost:5432/todo-app-db'
+const DB = 'postgres://postgres:abc@localhost:5432/todo_app_db'
 const sql = postgres(DB)
 const app = express()
 
@@ -44,9 +44,9 @@ const updateDescription = async (id, description) => {
   `
 }
 
-const deleteTask = async (title, date) => {
+const deleteTask = async (id) => {
   await sql`
-  DELETE FROM tasks WHERE title = ${title};`
+  DELETE FROM tasks WHERE id = ${id};`
 }
 
 app.post('/updateStatus', async (req, res) => {
@@ -85,8 +85,9 @@ app.post('/add-description', async (req, res) => {
 })
 
 app.post('/delete-task', async (req, res) => {
-  const { title, date } = req.body
-  await deleteTask(title, date)
+  const { id } = req.body
+  console.log(id)
+  await deleteTask(id)
   res.json({ message: 'OK' })
 })
 

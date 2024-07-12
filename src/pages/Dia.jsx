@@ -116,10 +116,11 @@ function Dia() {
     }
   }
 
-  const handleDelete = async (taskId) => {
+  const handleDelete = async (id) => {
     try {
-      await axios.delete(`/delete-tarefa/${taskId}`)
-      const updatedTasks = tasks.filter((task) => task.id !== taskId)
+      console.log(id)
+      await axios.post('/delete-task', { id })
+      const updatedTasks = tasks.filter((task) => task.id !== id)
       setTasks(updatedTasks)
     } catch (error) {
       console.error('Erro ao deletar tarefa:', error)
@@ -176,7 +177,12 @@ function Dia() {
                 >
                   {task.title}
                 </a>
-                <button className="delete-button">X</button>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDelete(task.id)}
+                >
+                  X
+                </button>
               </div>
             </li>
           ))}
