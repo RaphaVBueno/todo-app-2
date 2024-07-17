@@ -6,7 +6,7 @@ import '../App.css'
 
 function Dia() {
   const [input, setInput] = useState('')
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState(null)
   const { date } = useParams()
   const navigate = useNavigate()
 
@@ -23,8 +23,14 @@ function Dia() {
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        const response = await axios.get(`/dados?date=${date}`)
-        setTasks(response.data)
+        const response = await axios.get(
+          `https://bueno-devs-todo-api.fly.dev/tasks`,
+          {
+            params: { date },
+          }
+        )
+        setTasks(response.data.resposta)
+        console.log(response.data.resposta)
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
       }
@@ -75,16 +81,16 @@ function Dia() {
     }
   }
 
-  const handleChange = (event, title) => {
+  const handleChange = (event, id) => {
     const newStatus = event.target.checked
-    updateTaskStatus(title, newStatus)
+    updateTaskStatus(id, newStatus)
   }
 
-  const updateTaskStatus = async (title, status) => {
+  const updateTaskStatus = async (id, status) => {
     try {
-      await axios.post('/updateStatus', { title, status })
+      await axios.post('/updateStatus', { id, status })
       const updatedTasks = tasks.map((task) =>
-        task.title === title ? { ...task, status } : task
+        task.id === id ? { ...task, status } : task
       )
       const sortedTasks = updatedTasks.sort((a, b) => a.status - b.status) //
       setTasks(sortedTasks)
@@ -129,65 +135,71 @@ function Dia() {
 
   return (
     <main className="container">
-      <article>
-        <header>
-          <nav>
-            <h1>Tarefas</h1>
-            <ul>
-              <li>
-                <button onClick={handlePrevDay}>{'<'}</button>
+      {tasks ? (
+        <article>
+          <header>
+            <nav>
+              <h1>Tarefas</h1>
+              <ul>
+                <li>
+                  <button onClick={handlePrevDay}>{'<'}</button>
+                </li>
+                <li>
+                  <hgroup>
+                    <h3>{getDayLabel(date)}</h3>
+                    <p>{formattedDate}</p>
+                  </hgroup>
+                </li>
+                <li>
+                  <button onClick={handleNextDay}>{'>'}</button>
+                </li>
+              </ul>
+            </nav>
+          </header>
+          <div className="new-task">
+            <form role="group" onSubmit={handleSubmit}>
+              <input
+                type="text"
+                name="tarefa"
+                id="tarefa"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+              />
+              <button type="submit">+</button>
+            </form>
+          </div>
+          <ul>
+            {tasks.map((task) => (
+              <li key={task.id}>
+                <div className="task-item">
+                  <input
+                    type="checkbox"
+                    checked={task.status}
+                    onChange={(event) => handleChange(event, task.id)}
+                  />
+                  <a
+                    href="#"
+                    onClick={() => routeDescription(task.id, date)}
+                    className={
+                      task.status ? 'completed-task' : 'incomplete-task'
+                    }
+                  >
+                    {task.title}
+                  </a>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(task.id)}
+                  >
+                    X
+                  </button>
+                </div>
               </li>
-              <li>
-                <hgroup>
-                  <h3>{getDayLabel(date)}</h3>
-                  <p>{formattedDate}</p>
-                </hgroup>
-              </li>
-              <li>
-                <button onClick={handleNextDay}>{'>'}</button>
-              </li>
-            </ul>
-          </nav>
-        </header>
-        <div className="new-task">
-          <form role="group" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="tarefa"
-              id="tarefa"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-            />
-            <button type="submit">+</button>
-          </form>
-        </div>
-        <ul>
-          {tasks.map((task) => (
-            <li key={task.id}>
-              <div className="task-item">
-                <input
-                  type="checkbox"
-                  checked={task.status}
-                  onChange={(event) => handleChange(event, task.title)}
-                />
-                <a
-                  href="#"
-                  onClick={() => routeDescription(task.id, date)}
-                  className={task.status ? 'completed-task' : 'incomplete-task'}
-                >
-                  {task.title}
-                </a>
-                <button
-                  className="delete-button"
-                  onClick={() => handleDelete(task.id)}
-                >
-                  X
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </article>
+            ))}
+          </ul>
+        </article>
+      ) : (
+        <p>Carregando...</p>
+      )}
     </main>
   )
 }

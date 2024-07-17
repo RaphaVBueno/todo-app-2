@@ -32,9 +32,9 @@ const uptadeDados = async (title, date, user = 'rapha@mail.com') => {
   `
 }
 
-const updateStatus = async (title, status) => {
+const updateStatus = async (id, status) => {
   await sql`
-    UPDATE tasks SET status = ${status} WHERE title = ${title};
+    UPDATE tasks SET status = ${status} WHERE id = ${id};
   `
 }
 
@@ -43,15 +43,15 @@ const updateDescription = async (id, description) => {
     UPDATE tasks SET description = ${description} WHERE id = ${id};
   `
 }
-
+4
 const deleteTask = async (id) => {
   await sql`
   DELETE FROM tasks WHERE id = ${id};`
 }
 
 app.post('/updateStatus', async (req, res) => {
-  const { title, status } = req.body
-  await updateStatus(title, status)
+  const { id, status } = req.body
+  await updateStatus(id, status)
   res.json({ message: 'OK' })
 })
 
@@ -97,6 +97,5 @@ app.get('/id-dados', async (req, res) => {
   dados = await sql`
       SELECT * FROM tasks WHERE id = ${id};
     `
-  console.log(dados)
   res.send(dados)
 })
